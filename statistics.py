@@ -1,5 +1,6 @@
 """
 Statistics:
+{
 Games:[
 {
 Game time : ...,
@@ -11,6 +12,7 @@ Winner: Comp or Player 1 or Player 2,
 First: Comp or Player 1 or Player 2,
 Moves: 0..9,
 }, ...]
+}
 """
 
 import json
@@ -37,7 +39,7 @@ def save_statistics(statistics, filename=default_setting['Statistic filename']):
 
 def gen_game_stats(settings: dict, mode: str):
     game_stats = {
-        'Game time': dt.datetime.now(),
+        'Game time': dt.datetime.now().isoformat(),
         'Mode': mode,
         'Player 1': settings['Player 1'],
         'Player 2': settings['Player 2'],

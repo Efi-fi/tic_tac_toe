@@ -8,13 +8,6 @@ from rendering import rend_board, clr
 from comp import make_move as comp_move
 import random as rnd
 
-menu = {'main': ['Play', 'Setting', 'Exit'],
-        'play': ['One player', 'Two players', 'Back'],
-        'settings': list(default_setting) + ['Back'],
-        'level': ['Low', 'Medium', 'Hard', 'Back'],
-        'who first': ['Comp', 'Player', 'Random', 'Back'],
-        }
-
 
 def main():
     #curr_menu = menu['main']
@@ -54,16 +47,25 @@ def main():
             game_stats['Moves'] = moves
             print(rend_board(board))
             print(f'Win {active_player}: {game_stats[active_player]}!')
+            if 'Games' not in statistics:
+                statistics['Games'] = []
+            statistics['Games'].append(game_stats)
             break
+
         if moves >= 9:
             game_stats['Moves'] = moves
             print(rend_board(board))
             print(f'DRAW!')
+            if 'Games' not in statistics:
+                statistics['Games'] = []
+            statistics['Games'].append(game_stats)
             break
 
 
         print(rend_board(board))
         active_player, inactive_player = inactive_player, active_player
+
+    save_statistics(statistics)
 
 
 def check_win(b):

@@ -11,6 +11,14 @@ default_setting = {
 }
 
 
+menu = {'main': ['Play', 'Setting', 'Exit'],
+        'play': ['One player', 'Two players', 'Back'],
+        'settings': list(default_setting) + ['Back'],
+        'level': ['Low', 'Medium', 'Hard', 'Back'],
+        'who first': ['Comp', 'Player', 'Random', 'Back'],
+        }
+
+
 def read_setting(filename=default_filename):
     settings = default_setting
     try:
