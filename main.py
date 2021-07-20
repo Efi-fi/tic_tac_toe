@@ -32,16 +32,20 @@ def main():
     active_player = game_stats['First']
     inactive_player = def_inactive_player(active_player, mode)
     while True:
+        # Make a move
         if active_player == 'Comp':
             cell = comp_move(board, game_stats['Level'])
         else:
             cell = player_move(board, game_stats['Player 1'])
 
+        # Define char
         if active_player == game_stats['First']:
             board[cell] = 'X'
         else:
             board[cell] = 'O'
+
         moves += 1
+
         if check_win(board):
             game_stats['Winner'] = active_player
             game_stats['Moves'] = moves
@@ -61,9 +65,8 @@ def main():
             statistics['Games'].append(game_stats)
             break
 
-
-        print(rend_board(board))
-        active_player, inactive_player = inactive_player, active_player
+        print(rend_board(board))  # Print upd board
+        active_player, inactive_player = inactive_player, active_player  # swap players
 
     save_statistics(statistics)
 
