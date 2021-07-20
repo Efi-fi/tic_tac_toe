@@ -1,11 +1,13 @@
 import json
 
-
+default_player = 'Unknown'
 default_filename = 'settings.json'
 default_setting = {
-    'Level': 'Medium',
-    'Size': 3,
-    'Who first': 'Random',
+    'Player 1': default_player,
+    'Player 2': default_player,
+    'Level': 'Random',  # [AI, Random, Hard, Low]
+    'Who first': 'Random',  # [Random, Player, Comp] for mode 2, 3 always Random
+    'Statistic filename': 'statistics.json',
 }
 
 
