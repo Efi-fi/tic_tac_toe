@@ -1,147 +1,95 @@
+#! python
+
 """
 Game: Tic-tac-toe.
 """
 
-from settings import read_setting, save_settings, default_player, default_setting
-from statistics import read_statistics, save_statistics, gen_game_stats
-from rendering import rend_board, clr
-from comp import make_move as comp_move
-import random as rnd
+from cmd_game.tic_tac_toe.settings import read_setting, save_settings, default_setting, menu as sm
+from cmd_game.rendering import rend_menu, clr
+from cmd_game.tic_tac_toe.game import run_game
+import keyboard
+import time
+
+mode = '1'
+# '1' - Comp VS Player;
+# '2' - Player 1 VS Player 2;
+# '3' - Comp 1 VS Comp 2;
+
+
+menu = [sm['main']]
+selected_point = 0
+
+last_key = None
+exit_key = False
+play_key = False
+
+
+def key_down():
+    global selected_point, menu
+    if selected_point < len(menu[-1]) - 1:
+        selected_point += 1
+    else:
+        selected_point = 0
+
+
+def key_up():
+    global selected_point, menu
+    if selected_point > 0:
+        selected_point -= 1
+    else:
+        selected_point = len(menu[-1]) - 1
+
+
+def key_esc():
+    global selected_point, menu, exit_key
+    if len(menu) < 2:
+        exit_key = True
+    else:
+        selected_point = 0
+        menu.pop()
+
+
+def check_pressed_keys(event):
+    global selected_point, last_key, play_key, mode
+    if not last_key or (event.name != last_key.name) or (event.event_type == 'down' and last_key.event_type == 'up'):
+        if event.name == 'down':
+            key_down()
+        elif event.name == 'up':
+            key_up()
+        elif event.name == 'esc':
+            key_esc()
+        elif event.name == 'space':
+            if menu[-1][selected_point] == 'Exit':
+                key_esc()
+            elif menu[-1][selected_point] == 'Back':
+                menu.pop()
+                selected_point = 0
+            elif menu[-1][selected_point].lower() in sm:
+                menu.append(sm[menu[-1][selected_point].lower()])
+                selected_point = 0
+            elif menu[-1][selected_point] == 'One player':
+                mode = '1'
+                play_key = True
+            elif menu[-1][selected_point] == 'Two players':
+                mode = '2'
+                play_key = True
+    last_key = event
 
 
 def main():
-    #curr_menu = menu['main']
-    save_settings(default_setting)
+    global play_key
+    save_settings(default_setting)  # while debug
     settings = read_setting()
-    statistics = read_statistics()
-    mode = def_mode()
-    print(mode)
-    if mode in '12':
-        settings['Player 1'] = def_player(1)
-        if mode == '2':
-            settings['Player 2'] = def_player(2)
-    board = [' ' for i in range(9)]
-    #print(settings)
-    #print(statistics)
-
-    print('Start game!')
-    game_stats = gen_game_stats(settings, mode)
-    game_stats['First'] = def_who_first(settings, mode)
-    print(rend_board(board))
-    moves = 0
-    active_player = game_stats['First']
-    inactive_player = def_inactive_player(active_player, mode)
     while True:
-        # Make a move
-        if active_player == 'Comp':
-            cell = comp_move(board, game_stats['Level'])
-        else:
-            cell = player_move(board, game_stats['Player 1'])
-
-        # Define char
-        if active_player == game_stats['First']:
-            board[cell] = 'X'
-        else:
-            board[cell] = 'O'
-
-        moves += 1
-
-        if check_win(board):
-            game_stats['Winner'] = active_player
-            game_stats['Moves'] = moves
-            print(rend_board(board))
-            print(f'Win {active_player}: {game_stats[active_player]}!')
-            if 'Games' not in statistics:
-                statistics['Games'] = []
-            statistics['Games'].append(game_stats)
-            break
-
-        if moves >= 9:
-            game_stats['Moves'] = moves
-            print(rend_board(board))
-            print(f'DRAW!')
-            if 'Games' not in statistics:
-                statistics['Games'] = []
-            statistics['Games'].append(game_stats)
-            break
-
-        print(rend_board(board))  # Print upd board
-        active_player, inactive_player = inactive_player, active_player  # swap players
-
-    save_statistics(statistics)
-
-
-def check_win(b):
-    for i in range(3):
-        if b[i*3] == b[i*3+1] == b[i*3+2] and (b[i*3] != ' '):  # horizontal lines
-            return True
-        if b[i] == b[i+3] == b[i+6] and (b[i] != ' '):  # vertical lines
-            return True
-    if (b[0] == b[4] == b[8] and b[0] != ' ') or (b[2] == b[4] == b[6] and b[2] != ' '):  # diagonals
-        return True
-
-
-def player_move(board, nick):
-    try:
-        cell = int(input(f'Choose empty cell, {nick}: -->'))
-    except:
-        cell = -1
-    if cell in [i for i, char in enumerate(board) if char == ' ']:
-        return cell
-    else:
-        print('The cell must be empty. Choose another cell.')
-        return player_move(board, nick)
-
-
-def def_inactive_player(active_player, mode):
-    if active_player == 'Comp' or active_player == 'Player 2':
-        return 'Player 1'
-    elif mode == '1':
-        return 'Comp'
-    elif mode == '2':
-        return 'Player 2'
-
-
-def def_who_first(settings, mode):
-    if mode == '1':
-        if settings['Who first'] == 'Random':
-            return rnd.choice(['Player 1', 'Comp'])
-        elif settings['Who first'] == 'Player':
-            return 'Player 1'
-        else:
-            return 'Comp'
-    elif mode == '2':
-        return rnd.choice(['Player 1', 'Player 2'])
-
-
-def def_mode():
-    """
-    Allow choose game mode.
-    :return: game mode:
-    '1' - Comp VS Player;
-    '2' - Player 1 VS Player 2;
-    '3' - Comp 1 VS Comp 2;
-    """
-    mode = input('Hello, choose mode: 1 - Comp VS Player; 2 - Player 1 VS Player 2; 3 - Comp 1 VS Comp 2;\n-->')
-
-    if mode in '123':
-        return mode
-    else:
-        print(f'Incorrect mode: {mode}. Please, choose again.')
-        return def_mode()  # Use recursion
-
-
-def def_player(num: 'Number'):
-    """
-
-    :param num: Number of player
-    :return: String: player nick
-    """
-    player = input(f'Please input nick for Player {num}: ')
-    if player:
-        return player
-    else:
-        return f'{default_player} {num}'
+        clr(rend_menu(menu[-1], selected_point))
+        time.sleep(0.2)
+        keyboard.hook(check_pressed_keys)
+        if exit_key:
+            exit()
+        if play_key:
+            keyboard.unhook_all()
+            run_game(settings, mode)
+            play_key = False
 
 
 if __name__ == '__main__':

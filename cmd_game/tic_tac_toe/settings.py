@@ -1,17 +1,17 @@
 import json
 
 default_player = 'Unknown'
-default_filename = 'settings.json'
+default_filename = './game_info/settings.json'
 default_setting = {
     'Player 1': default_player,
     'Player 2': default_player,
     'Level': 'Random',  # [AI, Random, Hard, Low]
     'Who first': 'Random',  # [Random, Player, Comp] for mode 2, 3 always Random
-    'Statistic filename': 'statistics.json',
+    'Statistic filename': './game_info/statistics.json',
 }
 
 
-menu = {'main': ['Play', 'Setting', 'Exit'],
+menu = {'main': ['Play', 'Settings', 'Statistics', 'Exit'],
         'play': ['One player', 'Two players', 'Back'],
         'settings': list(default_setting) + ['Back'],
         'level': ['Low', 'Medium', 'Hard', 'Back'],

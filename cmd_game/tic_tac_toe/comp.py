@@ -17,12 +17,21 @@ def ai_move(board):
 
 
 def random_move(board):
+    """
+    Chooses random empty cell.
+    """
     return rnd.choice([i for i, char in enumerate(board) if char == ' '])
 
 
 def hard_move(board):
+    """
+    Chooses empty cell, that win.
+    """
     pass
 
 
 def low_move(board):
+    """
+    Chooses empty cell, that another player win.
+    """
     pass

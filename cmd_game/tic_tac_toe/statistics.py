@@ -18,7 +18,7 @@ Moves: 0..9,
 import json
 import platform
 import datetime as dt
-from settings import default_setting
+from cmd_game.tic_tac_toe.settings import default_setting
 
 
 def read_statistics(filename=default_setting['Statistic filename']):
