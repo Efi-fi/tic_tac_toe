@@ -1,42 +1,53 @@
-from cmd_game.tic_tac_toe.settings import read_setting, save_settings, default_player, default_setting, menu as sm
 from cmd_game.tic_tac_toe.statistics import read_statistics, save_statistics, gen_game_stats
-from cmd_game.rendering import rend_board, rend_menu, clr
 from cmd_game.tic_tac_toe.comp import make_move as comp_move
+from cmd_game.tic_tac_toe.settings import modes
+from cmd_game.rendering import rend_board, clr
 import random as rnd
 
 
 def run_game(settings, mode):
-    statistics = read_statistics()
-    clr('Then change your nick go to Settings\n')
-    # if mode in '12':
-    #     settings['Player 1'] = def_player(1)
-    #     if mode == '2':
-    #         settings['Player 2'] = def_player(2)
-    board = [' ' for i in range(9)]
-    # print(settings)
-    # print(statistics)
+    """
+    Start tic tac toe game.
 
-    print('Start game!')
-    game_stats = gen_game_stats(settings, mode)
-    game_stats['First'] = def_who_first(settings, mode)
-    clr(rend_board(board))
-    moves = 0
-    active_player = game_stats['First']
-    inactive_player = def_inactive_player(active_player, mode)
-    while True:
+    Use setting and mode. Save game statistics in JSON file.
+    """
+
+    statistics = read_statistics()
+    board = [' ' for _ in range(9)]
+    clr()
+    value = input(f'Game settings:\n'
+                  f'\tMode:\t{modes[mode]}\n'
+                  f'\tPlayer 1 nick:\t{settings["Player 1"]}\n'
+                  f'\tPlayer 2 nick:\t{settings["Player 2"]}\n'
+                  f'\tLevel:\t{settings["Level"]}\n'
+                  f'For starting press Enter,\n'
+                  f'else input someone that back in menu and change setting.')
+    if value:  # if value then return to menu
+        return
+
+    game_stats = gen_game_stats(settings, mode)  # dict for accumulate statistics for this game
+    game_stats['First'] = def_who_first(settings, mode)  # define beginner
+    clr(rend_board(board))  # clear terminal and show empty board
+    moves = 0  # counter for moves
+
+    active_player = game_stats['First']  # active player -> beginner
+    inactive_player = def_inactive_player(active_player, mode)  # inactive player -> second player (according mode)
+
+    while True:  # One cycle per move
         # Make a move
         if active_player == 'Comp':
-            cell = comp_move(board, game_stats['Level'])
+            cell = comp_move(board, game_stats['Level'])  # comp select cell
         else:
-            cell = player_move(board, active_player, game_stats[active_player])
+            cell = player_move(board, active_player, game_stats[active_player])  # player input selected cell
 
-        # Define char
+        # Define char for filling cell
         if active_player == game_stats['First']:
-            board[cell] = 'X'
+            board[cell] = 'X'  # beginner moved by X
         else:
             board[cell] = 'O'
 
         moves += 1
+        clr(rend_board(board))  # upd board after moving
 
         if check_win(board):
             game_stats['Winner'] = active_player
@@ -46,7 +57,7 @@ def run_game(settings, mode):
             if 'Games' not in statistics:
                 statistics['Games'] = []
             statistics['Games'].append(game_stats)
-            input('Press Enter then continue')
+            input('Press Enter then return in menu')
             break
 
         if moves >= 9:
@@ -56,16 +67,18 @@ def run_game(settings, mode):
             if 'Games' not in statistics:
                 statistics['Games'] = []
             statistics['Games'].append(game_stats)
-            input('Press Enter then continue')
+            input('Press Enter then return in menu')
             break
 
-        clr(rend_board(board))  # Print upd board
         active_player, inactive_player = inactive_player, active_player  # swap players
 
     save_statistics(statistics)
 
 
 def check_win(b):
+    """
+    Check win's combinations.
+    """
     for i in range(3):
         if b[i * 3] == b[i * 3 + 1] == b[i * 3 + 2] and (b[i * 3] != ' '):  # horizontal lines
             return True
@@ -76,6 +89,9 @@ def check_win(b):
 
 
 def player_move(board, player, nick):
+    """
+    Allow input selected cell by player.
+    """
     try:
         cell = int(input(f'{player}: Choose empty cell, {nick}: -->'))
     except:
@@ -84,10 +100,13 @@ def player_move(board, player, nick):
         return cell
     else:
         print('The cell must be empty. Choose another cell.')
-        return player_move(board, nick)
+        return player_move(board, player, nick)
 
 
 def def_inactive_player(active_player, mode):
+    """
+    Define inactive player.
+    """
     if active_player == 'Comp' or active_player == 'Player 2':
         return 'Player 1'
     elif mode == '1':
@@ -97,6 +116,9 @@ def def_inactive_player(active_player, mode):
 
 
 def def_who_first(settings, mode):
+    """
+    Define beginner according settings.
+    """
     if mode == '1':
         if settings['Who first'] == 'Random':
             return rnd.choice(['Player 1', 'Comp'])
@@ -118,15 +140,4 @@ def def_mode():
         return mode
     else:
         print(f'Incorrect mode: {mode}. Please, choose again.')
-        return def_mode()  # Use recursion
-
-
-def def_player(num: 'Number'):
-    """
-
-    """
-    player = input(f'Please input nick for Player {num}: ')
-    if player:
-        return player
-    else:
-        return f'{default_player} {num}'
+        return def_mode()  # Use recursion while correct input

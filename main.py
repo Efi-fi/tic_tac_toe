@@ -4,16 +4,21 @@
 Game: Tic-tac-toe.
 """
 
-from cmd_game.tic_tac_toe.settings import read_setting, save_settings, default_setting, menu as sm
+from cmd_game.tic_tac_toe.settings import read_setting, save_settings, default_setting, sm, input_set
 from cmd_game.rendering import rend_menu, clr
 from cmd_game.tic_tac_toe.game import run_game
+from cmd_game.tic_tac_toe.statistics import show_stat
 import keyboard
 import time
 
+
+FPS = 5
+
+save_settings(default_setting)  # while debug
+settings = read_setting()
 mode = '1'
 # '1' - Comp VS Player;
 # '2' - Player 1 VS Player 2;
-# '3' - Comp 1 VS Comp 2;
 
 
 menu = [sm['main']]
@@ -21,7 +26,24 @@ selected_point = 0
 
 last_key = None
 exit_key = False
+pause_key = False
 play_key = False
+
+
+def main():
+    global play_key, exit_key, settings
+    while True:
+        if not pause_key:
+            clr(rend_menu(menu[-1], settings, selected_point))
+            time.sleep(1/FPS)
+            keyboard.hook(check_pressed_keys)
+        if exit_key:
+            clr('Setting saved.\nPowered by Efi-fi.')
+            save_settings(settings)
+            exit()
+        if play_key:
+            run_game(settings, mode)
+            play_key = False
 
 
 def key_down():
@@ -50,8 +72,12 @@ def key_esc():
 
 
 def check_pressed_keys(event):
-    global selected_point, last_key, play_key, mode
+    """
+    Check keys and performing actions according event.
+    """
+    global selected_point, last_key, play_key, mode, settings, pause_key
     if not last_key or (event.name != last_key.name) or (event.event_type == 'down' and last_key.event_type == 'up'):
+        # processing events
         if event.name == 'down':
             key_down()
         elif event.name == 'up':
@@ -59,6 +85,7 @@ def check_pressed_keys(event):
         elif event.name == 'esc':
             key_esc()
         elif event.name == 'space':
+            # processing selected item
             if menu[-1][selected_point] == 'Exit':
                 key_esc()
             elif menu[-1][selected_point] == 'Back':
@@ -73,24 +100,20 @@ def check_pressed_keys(event):
             elif menu[-1][selected_point] == 'Two players':
                 mode = '2'
                 play_key = True
+            elif menu[-1][selected_point] == 'Statistics':
+                pause_key = True
+                clr()
+                show_stat()
+                input('Press Enter for Back\n')
+                pause_key = False
+            else:
+                pause_key = True
+                input_set(settings, menu, selected_point)
+                pause_key = False
     last_key = event
-
-
-def main():
-    global play_key
-    save_settings(default_setting)  # while debug
-    settings = read_setting()
-    while True:
-        clr(rend_menu(menu[-1], selected_point))
-        time.sleep(0.2)
-        keyboard.hook(check_pressed_keys)
-        if exit_key:
-            exit()
-        if play_key:
-            keyboard.unhook_all()
-            run_game(settings, mode)
-            play_key = False
 
 
 if __name__ == '__main__':
     main()
+else:
+    print('This module is not for import!')

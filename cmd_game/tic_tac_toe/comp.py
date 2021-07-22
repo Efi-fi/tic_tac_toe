@@ -2,6 +2,9 @@ import random as rnd
 
 
 def make_move(board, level):
+    """
+    Choosing algorithm for comp.
+    """
     if level == 'AI':
         return ai_move(board)
     elif level == 'Random':
@@ -13,7 +16,10 @@ def make_move(board, level):
 
 
 def ai_move(board):
-    pass
+    """
+    Chooses cell according AI-output.
+    """
+    return random_move(board)  # temporary
 
 
 def random_move(board):
@@ -27,11 +33,15 @@ def hard_move(board):
     """
     Chooses empty cell, that win.
     """
-    pass
+    return random_move(board)  # temporary
 
 
 def low_move(board):
     """
     Chooses empty cell, that another player win.
     """
-    pass
+    template = [3, 6, 7, 5, 1, 2, 0, 8, 4]  # Move sequence
+    template.reverse()
+    while board[template[-1]] != ' ':
+        template.pop()
+    return template.pop()
