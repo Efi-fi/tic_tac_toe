@@ -1,7 +1,7 @@
-from cmd_game.tic_tac_toe.statistics import read_statistics, save_statistics, gen_game_stats
-from cmd_game.tic_tac_toe.comp import make_move as comp_move
-from cmd_game.tic_tac_toe.settings import modes
-from cmd_game.rendering import rend_board, clr
+from txt_game.tic_tac_toe.statistics import read_statistics, save_statistics, gen_game_stats
+from txt_game.tic_tac_toe.comp import make_move as comp_move
+from txt_game.tic_tac_toe.settings import modes
+from txt_game.rendering import rend_board, clr
 import random as rnd
 
 

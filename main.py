@@ -4,17 +4,17 @@
 Game: Tic-tac-toe.
 """
 
-from cmd_game.tic_tac_toe.settings import read_setting, save_settings, default_setting, sm, input_set
-from cmd_game.rendering import rend_menu, clr
-from cmd_game.tic_tac_toe.game import run_game
-from cmd_game.tic_tac_toe.statistics import show_stat
+from txt_game.tic_tac_toe.settings import read_setting, save_settings, sm, input_set
+from txt_game.rendering import rend_menu, clr
+from txt_game.tic_tac_toe.game import run_game
+from txt_game.tic_tac_toe.statistics import show_stat
 import keyboard
+import threading
 import time
 
 
 FPS = 5
 
-save_settings(default_setting)  # while debug
 settings = read_setting()
 mode = '1'
 # '1' - Comp VS Player;
@@ -75,7 +75,7 @@ def check_pressed_keys(event):
     """
     Check keys and performing actions according event.
     """
-    global selected_point, last_key, play_key, mode, settings, pause_key
+    global selected_point, last_key, play_key, mode, settings, pause_key, fig
     if not last_key or (event.name != last_key.name) or (event.event_type == 'down' and last_key.event_type == 'up'):
         # processing events
         if event.name == 'down':
@@ -104,13 +104,14 @@ def check_pressed_keys(event):
                 pause_key = True
                 clr()
                 show_stat()
-                input('Press Enter for Back\n')
+                input('Press Enter to continue ')
                 pause_key = False
             else:
                 pause_key = True
                 input_set(settings, menu, selected_point)
                 pause_key = False
     last_key = event
+    keyboard.unhook_all()
 
 
 if __name__ == '__main__':

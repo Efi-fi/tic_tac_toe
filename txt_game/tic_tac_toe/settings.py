@@ -1,5 +1,5 @@
 import json
-from cmd_game.rendering import clr
+from txt_game.rendering import clr
 
 default_player = 'Unknown'
 default_filename = './game_info/settings.json'
